@@ -2,6 +2,11 @@ import process from "node:process";
 import { URL } from "node:url";
 import { Client, GatewayIntentBits } from "discord.js";
 import { loadEvents } from "./util/loaders";
+import { loadAssets } from "./assets";
+
+process.loadEnvFile(new URL("../.env", import.meta.url));
+
+loadAssets(new URL("../assets/", import.meta.url));
 
 // Initialize the client
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });

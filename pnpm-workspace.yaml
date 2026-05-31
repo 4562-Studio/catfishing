@@ -1,2 +1,4 @@
 allowBuilds:
+  canvas: false
   esbuild: true
+  sharp: false

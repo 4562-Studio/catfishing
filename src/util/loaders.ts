@@ -38,12 +38,12 @@ export async function loadStructures<Structure>(
 
   // Create a glob pattern to match the .js files
   const basePath = dir instanceof URL ? fileURLToPath(dir) : dir.toString();
-  const pattern = resolve(basePath, recursive ? "**/*.js" : "*.js");
+  const pattern = resolve(basePath, recursive ? "**/*.ts" : "*.ts");
 
   // Loop through all the matching files in the directory
   for await (const file of glob(pattern)) {
     // If the file is index.js, skip the file
-    if (file.endsWith("/index.js")) {
+    if (file.endsWith("/index.ts")) {
       continue;
     }
 
