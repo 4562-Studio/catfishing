@@ -6,6 +6,8 @@ export default {
     name: "user",
   },
   async execute(interaction) {
-    await interaction.reply(`This command was run by ${interaction.user.username}.`);
+    await interaction.reply(
+      `This command was run by ${interaction.user.username}.`,
+    );
   },
 } satisfies Command;

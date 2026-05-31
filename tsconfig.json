@@ -6,7 +6,8 @@
     "moduleResolution": "bundler",
     "target": "esnext",
     "outDir": "dist",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strict": true // required for zod
   },
   "include": ["src"]
 }

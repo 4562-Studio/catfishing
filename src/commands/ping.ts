@@ -1,3 +1,4 @@
+import { MessageFlags, bold, italic } from "discord.js";
 import type { Command } from "./index";
 
 export default {
@@ -6,6 +7,11 @@ export default {
     name: "ping",
   },
   async execute(interaction) {
-    await interaction.reply("Pong!");
+    const { client } = interaction;
+    const emoji = client.emojis.cache.random()?.toString() ?? "";
+    await interaction.reply({
+      content: `${bold(italic("PONG!"))} ${emoji}`,
+      flags: MessageFlags.Ephemeral,
+    });
   },
 } satisfies Command;
