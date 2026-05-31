@@ -3,7 +3,7 @@ import { URL } from "node:url";
 import { Client, GatewayIntentBits } from "discord.js";
 import { loadEvents } from "./util/loaders";
 
-process.loadEnvFile("./.env");
+process.loadEnvFile(new URL("../.env", import.meta.url));
 
 // Initialize the client
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
