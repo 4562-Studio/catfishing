@@ -1,6 +1,8 @@
 [tools]
 pnpm = { version = "11" }
 
+[env]
+_.file = '.env'
+
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
-env_file = '.env'
