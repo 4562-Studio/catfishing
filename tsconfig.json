@@ -7,7 +7,7 @@
     "target": "esnext",
     "outDir": "dist",
     "skipLibCheck": true,
-    "strict": true // required for zod
+    "strict": true
   },
   "include": ["src"]
 }
