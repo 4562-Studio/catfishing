@@ -10,7 +10,7 @@ export default defineConfig({
   },
   rules: {
     "func-style": "off",
-   "max-statements": ["error", { max: 15 }]
+    "max-statements": ["error", { max: 15 }],
     "no-ternary": "off",
   },
 });

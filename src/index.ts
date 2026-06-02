@@ -16,16 +16,12 @@ const client = new Client({
 
 const ctx: BotContext = { logger };
 
-// once() so reconnects don't re-trigger startup logic like command registration
-client.once(
-  Events.ClientReady,
-  async (readyClient) => await ready(readyClient, ctx),
+// Use once() so reconnects don't re-trigger startup logic like command registration
+client.once(Events.ClientReady, (readyClient) => ready(readyClient, ctx));
+
+// Use on() since interactions keep firing throughout the bot's lifetime
+client.on(Events.InteractionCreate, (interaction) =>
+  interactionCreate(interaction, ctx),
 );
 
-// on() since interactions keep firing throughout the bot's lifetime
-client.on(
-  Events.InteractionCreate,
-  async (interaction) => await interactionCreate(interaction, ctx),
-);
-
-client.login(env.DISCORD_TOKEN);
+await client.login(env.DISCORD_TOKEN);

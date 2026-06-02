@@ -5,6 +5,7 @@
     "module": "preserve",
     "moduleResolution": "bundler",
     "target": "esnext",
+    "rootDir": ".",
     "outDir": "dist",
     "skipLibCheck": true,
     "strict": true

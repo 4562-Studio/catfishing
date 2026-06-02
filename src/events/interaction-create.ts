@@ -7,7 +7,6 @@ import {
   codeBlock,
 } from "discord.js";
 import { getEmoji } from "../util/format";
-import logger from "../util/logger";
 
 export default async function interactionCreate(
   interaction: Interaction<CacheType>,
@@ -23,19 +22,20 @@ export default async function interactionCreate(
     return;
   }
 
+  const log = ctx.logger.child({ command: interaction.commandName });
+
   try {
     await command.execute(interaction, ctx);
   } catch (error) {
-    logger.error(
+    log.error(
       {
-        command: interaction.commandName,
-        error,
+        err: error,
         user: interaction.user.id,
       },
       "Command execution failed",
     );
 
-    const emoji = getEmoji("catsurpised", interaction.client);
+    const emoji = getEmoji("catsurprised", interaction.client);
     // String() because thrown values aren't guaranteed to be Error instances
     const codeBlockContent = codeBlock(String(error));
 
@@ -45,13 +45,9 @@ export default async function interactionCreate(
       flags: MessageFlags.Ephemeral,
     };
 
-    // Reply() throws if the interaction was already replied to or deferred.
-    // FollowUp() works in both cases, so we branch to avoid a double-reply error.
-    const response =
-      interaction.replied || interaction.deferred
-        ? interaction.followUp
-        : interaction.reply;
-
-    await response(msg);
+    // Reply() throws if already replied/deferred, followUp() works in both cases.
+    await (interaction.replied || interaction.deferred
+      ? interaction.followUp(msg)
+      : interaction.reply(msg));
   }
 }
