@@ -5,14 +5,14 @@
   "type": "module",
   "scripts": {
     "build": "rolldown -c",
-    "dev": "tsx --env-file=.env --watch src/index.ts",
+    "dev": "tsx --watch src/index.ts",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "unregister-commands": "tsx --env-file=.env src/util/unregister-commands.ts"
+    "unregister-commands": "tsx src/util/unregister-commands.ts"
   },
   "dependencies": {
     "@discordjs/core": "^2.3.0",
