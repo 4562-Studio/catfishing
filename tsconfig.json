@@ -5,8 +5,10 @@
     "module": "preserve",
     "moduleResolution": "bundler",
     "target": "esnext",
+    "rootDir": ".",
     "outDir": "dist",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strict": true
   },
   "include": ["src"]
 }

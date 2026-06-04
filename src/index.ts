@@ -1,24 +1,27 @@
-import process from "node:process";
-import { URL } from "node:url";
-import { Client, GatewayIntentBits } from "discord.js";
-import { loadEvents } from "./util/loaders";
+import { Client, Events, GatewayIntentBits } from "discord.js";
+import type { BotContext } from "./commands";
+import env from "./util/env";
+import interactionCreate from "./events/interaction-create";
+import logger from "./util/logger";
+import ready from "./events/ready";
 
-// Initialize the client
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    // Required for slash command routing and guild membership APIs.
+    GatewayIntentBits.Guilds,
+    // Required to populate `client.emojis.cache` with guild emojis.
+    GatewayIntentBits.GuildExpressions,
+  ],
+});
 
-// Load the events and commands
-const events = await loadEvents(new URL("events/", import.meta.url));
+const ctx: BotContext = { logger };
 
-// Register the event handlers
-for (const event of events) {
-  client[event.once ? "once" : "on"](event.name, async (...args) => {
-    try {
-      await event.execute(...args);
-    } catch (error) {
-      console.error(`Error executing event ${String(event.name)}:`, error);
-    }
-  });
-}
+// Use once() so reconnects don't re-trigger startup logic like command registration
+client.once(Events.ClientReady, (readyClient) => ready(readyClient, ctx));
 
-// Login to the client
-void client.login(process.env.DISCORD_TOKEN);
+// Use on() since interactions keep firing throughout the bot's lifetime
+client.on(Events.InteractionCreate, (interaction) =>
+  interactionCreate(interaction, ctx),
+);
+
+await client.login(env.DISCORD_TOKEN);

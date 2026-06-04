@@ -8,4 +8,9 @@ export default defineConfig({
     style: "warn",
     suspicious: "warn",
   },
+  rules: {
+    "func-style": "off",
+    "max-statements": ["error", { max: 15 }],
+    "no-ternary": "off",
+  },
 });

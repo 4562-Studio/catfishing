@@ -1,33 +1,44 @@
-import type { CommandInteraction, RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
-import { z } from "zod";
-import type { StructurePredicate } from "../util/loaders";
+import {
+  type ChatInputCommandInteraction,
+  Collection,
+  type RESTPostAPIChatInputApplicationCommandsJSONBody,
+} from "discord.js";
+import type { Logger } from "pino";
+import ping from "./ping";
+import user from "./utility/user";
 
 /**
- * Defines the structure of a command
+ * Shared state passed as the second argument to every command's `execute` handler.
+ * Add shared resources here as the bot grows (e.g. database clients, API wrappers).
+ * Keeping these here avoids module-level singletons and makes handlers easier to test.
  */
-export interface Command {
-  /**
-   * The data for the command
-   */
-  data: RESTPostAPIApplicationCommandsJSONBody;
-  /**
-   * The function to execute when the command is called
-   *
-   * @param interaction - The interaction of the command
-   */
-  execute(interaction: CommandInteraction): Promise<void> | void;
+export interface BotContext {
+  /** Bot-level logger. Commands should call `logger.child({ command: "<name>" })` for scoped logs. */
+  logger: Logger;
 }
 
-/**
- * Defines the schema for a command
- */
-export const schema = z.object({
-  data: z.record(z.any()),
-  execute: z.function(),
-});
+/** The shape every command module must export. */
+export interface Command {
+  /** Slash command definition. Used for Discord API registration and interaction routing by name. */
+  data: RESTPostAPIChatInputApplicationCommandsJSONBody;
+
+  /**
+   * Called when a user invokes the command.
+   * Should throw on unrecoverable errors - the caller in index.ts catches and sends an error reply.
+   */
+  execute: (
+    interaction: ChatInputCommandInteraction,
+    ctx: BotContext,
+  ) => Promise<void>;
+}
+
+// Add new commands here. Each entry is keyed by its slash command name at startup.
+const cmdList = [ping, user];
 
 /**
- * Defines the predicate to check if an object is a valid Command type.
+ * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.
+ * Built once at module load. The `InteractionCreate` handler looks up commands from here.
  */
-export const predicate: StructurePredicate<Command> = (structure: unknown): structure is Command =>
-  schema.safeParse(structure).success;
+export const commands = new Collection<string, Command>(
+  cmdList.map((cmd) => [cmd.data.name, cmd]),
+);
