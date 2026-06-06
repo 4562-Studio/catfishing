@@ -13,4 +13,14 @@ export default defineConfig({
     "max-statements": ["error", { max: 15 }],
     "no-ternary": "off",
   },
+  overrides: [
+    {
+      files: ["src/**/*.spec.ts"],
+      rules: {
+        "init-declarations": "off",
+        "max-lines-per-function": "off",
+        "no-magic-numbers": "off",
+      },
+    },
+  ],
 });
