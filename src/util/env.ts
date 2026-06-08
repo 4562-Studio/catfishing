@@ -16,6 +16,9 @@ export default createEnv({
         /^\d{17,19}$/u,
         "Invalid Discord application ID (expected 17-19 digit snowflake)",
       ),
+    /** Database URL, used for persistence */
+    // Either file path or url to hosted SQLite
+    DATABASE_URL: z.string().or(z.url()),
     /** Bot token from the Discord Developer Portal. */
     // Format: <base64url(user_id)>.<base64url(timestamp)>.<base64url(hmac)>
     DISCORD_TOKEN: z
