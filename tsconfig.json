@@ -8,7 +8,8 @@
     "rootDir": ".",
     "outDir": "dist",
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "types": ["node"]
   },
   "include": ["src"]
 }
