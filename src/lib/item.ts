@@ -1,3 +1,5 @@
+export const DEFAULT_MAX_STACK_SIZE = 99;
+
 export enum ItemType {
   Cosmetic = "cosmetic",
   Cat = "cat",
@@ -10,18 +12,17 @@ export interface ItemOptions {
   id: string;
   name: string;
   description: string;
-  stackable: boolean;
-  maxStackSize?: number;
+  maxStackSize: number;
   artwork: string;
   type: ItemType;
   value: number;
-  sellable?: boolean;
-  tradeable?: boolean;
-  droppable?: boolean;
+  sellable: boolean;
+  tradeable: boolean;
+  droppable: boolean;
 }
 
 export default class Item {
-  protected item: Required<ItemOptions>;
+  protected item: ItemOptions;
 
   /**
    * Create a new Item with the given item options.
@@ -41,27 +42,17 @@ export default class Item {
       throw new Error("Item value cannot be negative");
     }
 
-    if (item.maxStackSize !== undefined && item.maxStackSize <= 0) {
+    if (item.maxStackSize <= 0) {
       throw new Error("Item max stack size must be positive");
     }
 
-    if (!item.stackable && item.maxStackSize !== undefined && item.maxStackSize > 1) {
-      throw new Error("Non-stackable items cannot have a max stack size above 1");
-    }
-
-    this.item = {
-      ...item,
-      maxStackSize: item.maxStackSize ?? (item.stackable ? 99 : 1),
-      sellable: item.sellable ?? true,
-      tradeable: item.tradeable ?? true,
-      droppable: item.droppable ?? true,
-    };
+    this.item = { ...item };
   }
 
   /**
    * Returns the raw item data.
    */
-  public getItem(): Required<ItemOptions> {
+  public getItem(): ItemOptions {
     return { ...this.item };
   }
 
@@ -78,7 +69,7 @@ export default class Item {
   }
 
   public isStackable(): boolean {
-    return this.item.stackable;
+    return this.item.maxStackSize > 1;
   }
 
   public getMaxStackSize(): number {
