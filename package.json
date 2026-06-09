@@ -12,17 +12,23 @@
     "lint:fix": "oxlint --fix",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "unregister-commands": "tsx src/util/unregister-commands.ts"
+    "unregister-commands": "tsx src/util/unregister-commands.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:ui": "drizzle-kit studio"
   },
   "dependencies": {
     "@discordjs/core": "^2.3.0",
+    "@libsql/client": "^0.17.3",
     "@t3-oss/env-core": "^0.13.11",
     "discord.js": "^14.24.0",
+    "drizzle-orm": "^1.0.0-rc.3",
     "pino": "^10.3.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",
     "@types/node": "^25.9.1",
+    "drizzle-kit": "1.0.0-rc.3",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
     "pino-pretty": "^13.1.3",
