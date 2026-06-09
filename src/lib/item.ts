@@ -11,6 +11,7 @@ export interface ItemOptions {
   name: string;
   description: string;
   maxStackSize: number;
+  emoji: string; // Assign an emoji to Item, as well as a larger artwork.
   artwork: string;
   type: ItemType;
   value: number;
@@ -42,6 +43,14 @@ export default class Item {
 
     if (item.maxStackSize <= 0) {
       throw new Error("Item max stack size must be positive");
+    }
+
+    if (!Number.isSafeInteger(item.maxStackSize)) {
+        throw new Error("Provided max stack size not safe")
+    }
+
+    if (!Number.isSafeInteger(item.value)) {
+        throw new Error("Provided item value not safe")
     }
 
     this.item = { ...item };
@@ -78,6 +87,10 @@ export default class Item {
     return this.item.artwork;
   }
 
+  public getEmoji(): string {
+    return this.item.emoji;
+  }
+
   public getType(): ItemType {
     return this.item.type;
   }
@@ -99,6 +112,6 @@ export default class Item {
   }
 
   public getDisplayName(): string {
-    return `${this.item.artwork} ${this.item.name}`;
+    return `${this.item.emoji} ${this.item.name}`;
   }
 }
