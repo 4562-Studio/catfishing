@@ -1,15 +1,15 @@
 import type { Command } from "./index";
+import env from "../util/env";
 import {
   ChannelType,
   SlashCommandBuilder,
   ThreadAutoArchiveDuration,
-  type TextChannel,
 } from "discord.js";
 
 type FishingArea = {
   threadId: string;
   threadName: string;
-  userId: string;
+  userId: string; // Needed for later.
 };
 
 const activeFishingAreas = new Map<string, FishingArea>(); // Move from memory to DB at some point?
@@ -33,15 +33,12 @@ export default {
     ).toJSON(),
 
   async execute(interaction) {
-    const botChannel = interaction.guild?.channels.cache.find(
-      (channel): channel is TextChannel =>
-        channel.name === "catfishing" &&
-        channel.type === ChannelType.GuildText,
-    );
-
+    const botChannel = interaction.guild?.channels.cache.get(env.CATFISHING_CHANNEL_ID);
     const userFishingArea = activeFishingAreas.get(interaction.user.id);
+    const member = await interaction.guild?.members.fetch(interaction.user.id);
+    const displayName = member?.displayName ?? interaction.user.username;
 
-    if (botChannel == undefined || interaction.channelId !== botChannel.id) {
+    if (botChannel == undefined || interaction.channelId !== botChannel.id || botChannel.type !== ChannelType.GuildText) {
       await interaction.reply({
         content: "You can only use this command in the #catfishing channel!",
         ephemeral: true,
@@ -68,7 +65,7 @@ export default {
     const isPrivate = interaction.options.getBoolean("private") ?? false;
 
     const thread = await botChannel.threads.create({
-      name: `${interaction.user.username}'s ${threadName}`,
+      name: `${displayName}'s ${threadName}`,
       reason: "Go fish!",
       autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
       type: isPrivate ? ChannelType.PrivateThread : ChannelType.PublicThread,
@@ -83,7 +80,7 @@ export default {
     activeFishingAreas.set(interaction.user.id, fishingArea);
     
     await thread.members.add(interaction.user.id);
-    await thread.send("Good luck!");
+    await thread.send("Good luck! 🎣");
 
     await interaction.reply({
       content: `Created fishing area: ${thread}`,
