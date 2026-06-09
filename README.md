@@ -53,6 +53,7 @@ Edit `.env` and fill in:
 | `DISCORD_TOKEN`  | Bot authentication token                      |
 | `APPLICATION_ID` | Discord application ID                        |
 | `GUILD_ID`       | Server ID for the bot to register commands in |
+| `CATFISHING_CHANNEL_ID`       | ID of channel designated for fishing |
 
 ## Development
 
