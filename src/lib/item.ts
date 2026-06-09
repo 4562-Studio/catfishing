@@ -1,5 +1,3 @@
-export const DEFAULT_MAX_STACK_SIZE = 99;
-
 export enum ItemType {
   Cosmetic = "cosmetic",
   Cat = "cat",
