@@ -15,6 +15,9 @@ const snowflake = (name: string) =>
 export default createEnv({
   runtimeEnv: process.env,
   server: {
+    /** Database URL, used for persistence */
+    // Either file path or url to hosted SQLite
+    DATABASE_URL: z.string().or(z.url()),
     /** The bot's application ID, used when registering slash commands via the REST API. */
     // Snowflake: 17-19 digit integer
     APPLICATION_ID: snowflake("application"),
