@@ -12,7 +12,7 @@ import cosmetic from "./cosmetic";
 import inventory from "./inventory";
 import rod from "./rod";
 import sell from "./sell";
-import fishingarea from "./fishingarea";
+import fishingspot from "./fishingspot";
 
 /**
  * Shared state passed as the second argument to every command's `execute` handler.
@@ -40,7 +40,7 @@ export interface Command {
 }
 
 // Add new commands here. Each entry is keyed by its slash command name at startup.
-const cmdList = [bait, cat, cosmetic, inventory, ping, rod, sell, user, fishingarea];
+const cmdList = [bait, cat, cosmetic, inventory, ping, rod, sell, user, fishingspot];
 
 /**
  * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.
