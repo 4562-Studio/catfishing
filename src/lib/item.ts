@@ -1,24 +1,6 @@
-export enum ItemType {
-  Cosmetic = "cosmetic",
-  Cat = "cat",
-  Trinket = "trinket",
-  Rod = "rod",
-  Bait = "bait",
-}
+import { type ItemOptions, type ItemType, itemSchema } from "../schemas/item";
 
-export interface ItemOptions {
-  id: string;
-  name: string;
-  description: string;
-  maxStackSize: number;
-  emoji: string; // Assign an emoji to Item, as well as a larger artwork.
-  artwork: string;
-  type: ItemType;
-  value: number;
-  sellable: boolean;
-  tradeable: boolean;
-  droppable: boolean;
-}
+const SINGLE_STACK_ITEM_SIZE = 1;
 
 export default class Item {
   protected item: ItemOptions;
@@ -26,34 +8,12 @@ export default class Item {
   /**
    * Create a new Item with the given item options.
    *
+   * The provided item options object is validated by itemSchema before being stored.
+   *
    * @param item The item data used to create this item.
    */
   constructor(item: ItemOptions) {
-    if (item.id.trim().length === 0) {
-      throw new Error("Item id cannot be empty");
-    }
-
-    if (item.name.trim().length === 0) {
-      throw new Error("Item name cannot be empty");
-    }
-
-    if (item.value < 0) {
-      throw new Error("Item value cannot be negative");
-    }
-
-    if (item.maxStackSize <= 0) {
-      throw new Error("Item max stack size must be positive");
-    }
-
-    if (!Number.isSafeInteger(item.maxStackSize)) {
-        throw new Error("Provided max stack size not safe")
-    }
-
-    if (!Number.isSafeInteger(item.value)) {
-        throw new Error("Provided item value not safe")
-    }
-
-    this.item = { ...item };
+    this.item = itemSchema.parse(item);
   }
 
   /**
@@ -76,7 +36,7 @@ export default class Item {
   }
 
   public isStackable(): boolean {
-    return this.item.maxStackSize > 1;
+    return this.item.maxStackSize > SINGLE_STACK_ITEM_SIZE;
   }
 
   public getMaxStackSize(): number {
@@ -109,6 +69,10 @@ export default class Item {
 
   public isDroppable(): boolean {
     return this.item.droppable;
+  }
+
+  public isEquippable(): boolean {
+    return this.item.equippable;
   }
 
   public getDisplayName(): string {
