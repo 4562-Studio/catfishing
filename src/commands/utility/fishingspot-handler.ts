@@ -75,11 +75,13 @@ async function getTextChannelOrReply(
   return null;
 }
 
-async function getFishingSpotRequest(
-  interaction: ChatInputCommandInteraction,
-  channel: TextChannel,
-  guild: Guild,
-): Promise<FishingSpotRequest> {
+async function getFishingSpotRequest(params: {
+  interaction: ChatInputCommandInteraction;
+  channel: TextChannel;
+  guild: Guild;
+}): Promise<FishingSpotRequest> {
+  const { interaction, channel, guild } = params;
+
   const userId = interaction.user.id;
   const member = await guild.members.fetch(userId);
 
@@ -156,12 +158,14 @@ async function waitForFishingSpotButton(
     .catch(() => null);
 }
 
-async function jumpToExistingFishingSpot(
-  interaction: ChatInputCommandInteraction,
-  existingThread: ThreadChannel,
-  request: FishingSpotRequest,
-  log: Logger,
-): Promise<void> {
+async function jumpToExistingFishingSpot(params: {
+  interaction: ChatInputCommandInteraction;
+  existingThread: ThreadChannel;
+  request: FishingSpotRequest;
+  log: Logger;
+}): Promise<void> {
+  const { interaction, existingThread, request, log } = params;
+
   if (existingThread.archived) {
     const reopenedThread = await existingThread
       .setArchived(false)
@@ -205,12 +209,14 @@ async function jumpToExistingFishingSpot(
   });
 }
 
-async function replaceExistingFishingSpot(
-  interaction: ChatInputCommandInteraction,
-  existingThread: ThreadChannel,
-  fishingSpotKey: string,
-  log: Logger,
-): Promise<boolean> {
+async function replaceExistingFishingSpot(params: {
+  interaction: ChatInputCommandInteraction;
+  existingThread: ThreadChannel;
+  fishingSpotKey: string;
+  log: Logger;
+}): Promise<boolean> {
+  const { interaction, existingThread, fishingSpotKey, log } = params;
+
   const deletedThread = await existingThread
     .delete()
     .catch((error: unknown) => {
@@ -278,12 +284,14 @@ async function showExistingFishingSpotPrompt(
   });
 }
 
-async function handleExistingFishingSpotButton(
-  interaction: ChatInputCommandInteraction,
-  existingThread: ThreadChannel,
-  request: FishingSpotRequest,
-  log: Logger,
-): Promise<boolean> {
+async function handleExistingFishingSpotButton(params: {
+  interaction: ChatInputCommandInteraction;
+  existingThread: ThreadChannel;
+  request: FishingSpotRequest;
+  log: Logger;
+}): Promise<boolean> {
+  const { interaction, existingThread, request, log } = params;
+
   const buttonInteraction = await waitForFishingSpotButton(
     interaction,
     request.userId,
@@ -297,29 +305,36 @@ async function handleExistingFishingSpotButton(
   await buttonInteraction.deferUpdate();
 
   if (buttonInteraction.customId === JUMP_TO_FISHING_SPOT_CUSTOM_ID) {
-    await jumpToExistingFishingSpot(interaction, existingThread, request, log);
+    await jumpToExistingFishingSpot({
+      existingThread,
+      interaction,
+      log,
+      request,
+    });
     return false;
   }
 
   if (buttonInteraction.customId === REPLACE_FISHING_SPOT_CUSTOM_ID) {
-    return replaceExistingFishingSpot(
-      interaction,
+    return replaceExistingFishingSpot({
       existingThread,
-      request.fishingSpotKey,
+      fishingSpotKey: request.fishingSpotKey,
+      interaction,
       log,
-    );
+    });
   }
 
   await replyNoFishingSpotChanges(interaction);
   return false;
 }
 
-async function promptForExistingFishingSpot(
-  interaction: ChatInputCommandInteraction,
-  existingThread: ThreadChannel,
-  request: FishingSpotRequest,
-  log: Logger,
-): Promise<boolean> {
+async function promptForExistingFishingSpot(params: {
+  interaction: ChatInputCommandInteraction;
+  existingThread: ThreadChannel;
+  request: FishingSpotRequest;
+  log: Logger;
+}): Promise<boolean> {
+  const { interaction, existingThread, request, log } = params;
+
   const shouldStartPrompt = await startFishingSpotPrompt(
     interaction,
     request.fishingSpotKey,
@@ -332,22 +347,24 @@ async function promptForExistingFishingSpot(
   try {
     await showExistingFishingSpotPrompt(interaction, existingThread);
 
-    return handleExistingFishingSpotButton(
-      interaction,
+    return handleExistingFishingSpotButton({
       existingThread,
-      request,
+      interaction,
       log,
-    );
+      request,
+    });
   } finally {
     activeFishingSpotPrompts.delete(request.fishingSpotKey);
   }
 }
 
-async function shouldCreateFishingSpot(
-  interaction: ChatInputCommandInteraction,
-  request: FishingSpotRequest,
-  log: Logger,
-): Promise<boolean> {
+async function shouldCreateFishingSpot(params: {
+  interaction: ChatInputCommandInteraction;
+  request: FishingSpotRequest;
+  log: Logger;
+}): Promise<boolean> {
+  const { interaction, request, log } = params;
+
   const existingThread = await fetchExistingFishingSpotThread(
     interaction,
     request.fishingSpotKey,
@@ -357,19 +374,21 @@ async function shouldCreateFishingSpot(
     return true;
   }
 
-  return promptForExistingFishingSpot(
-    interaction,
+  return promptForExistingFishingSpot({
     existingThread,
-    request,
+    interaction,
     log,
-  );
+    request,
+  });
 }
 
-async function createFishingSpotThread(
-  interaction: ChatInputCommandInteraction,
-  request: FishingSpotRequest,
-  log: Logger,
-): Promise<ThreadChannel | null> {
+async function createFishingSpotThread(params: {
+  interaction: ChatInputCommandInteraction;
+  request: FishingSpotRequest;
+  log: Logger;
+}): Promise<ThreadChannel | null> {
+  const { interaction, request, log } = params;
+
   const thread = await request.channel.threads
     .create({
       autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
@@ -416,12 +435,14 @@ function rememberFishingSpot(
   });
 }
 
-async function setupFishingSpotThread(
-  interaction: ChatInputCommandInteraction,
-  request: FishingSpotRequest,
-  thread: ThreadChannel,
-  log: Logger,
-): Promise<void> {
+async function setupFishingSpotThread(params: {
+  interaction: ChatInputCommandInteraction;
+  request: FishingSpotRequest;
+  thread: ThreadChannel;
+  log: Logger;
+}): Promise<void> {
+  const { interaction, request, thread, log } = params;
+
   await thread.members.add(request.userId).catch((error: unknown) => {
     log.warn(
       {
@@ -442,19 +463,31 @@ async function setupFishingSpotThread(
   }
 }
 
-async function createAndSetupFishingSpot(
-  interaction: ChatInputCommandInteraction,
-  request: FishingSpotRequest,
-  log: Logger,
-): Promise<void> {
-  const thread = await createFishingSpotThread(interaction, request, log);
+async function createAndSetupFishingSpot(params: {
+  interaction: ChatInputCommandInteraction;
+  request: FishingSpotRequest;
+  log: Logger;
+}): Promise<void> {
+  const { interaction, request, log } = params;
+
+  const thread = await createFishingSpotThread({
+    interaction,
+    log,
+    request,
+  });
 
   if (thread === null) {
     return;
   }
 
   rememberFishingSpot(request, thread);
-  await setupFishingSpotThread(interaction, request, thread, log);
+
+  await setupFishingSpotThread({
+    interaction,
+    log,
+    request,
+    thread,
+  });
 
   await interaction.editReply({
     components: [],
@@ -478,17 +511,25 @@ export async function handleFishingSpotCommand(
     return;
   }
 
-  const request = await getFishingSpotRequest(interaction, channel, guild);
-
-  const shouldCreateSpot = await shouldCreateFishingSpot(
+  const request = await getFishingSpotRequest({
+    channel,
+    guild,
     interaction,
-    request,
+  });
+
+  const shouldCreateSpot = await shouldCreateFishingSpot({
+    interaction,
     log,
-  );
+    request,
+  });
 
   if (!shouldCreateSpot) {
     return;
   }
 
-  await createAndSetupFishingSpot(interaction, request, log);
+  await createAndSetupFishingSpot({
+    interaction,
+    log,
+    request,
+  });
 }
