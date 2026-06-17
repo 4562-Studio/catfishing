@@ -21,9 +21,6 @@ export default createEnv({
     /** The bot's application ID, used when registering slash commands via the REST API. */
     // Snowflake: 17-19 digit integer
     APPLICATION_ID: snowflake("application"),
-    /** The Discord guild (server) ID to register slash commands to. Guild-scoped commands update instantly. */
-    // Snowflake: 17-19 digit integer
-    GUILD_ID: snowflake("guild"),
     /** Database URL, used for persistence */
     // Either file path or url to hosted SQLite
     DATABASE_URL: z.string().or(z.url()),
@@ -35,5 +32,8 @@ export default createEnv({
         /^[A-Za-z0-9_-]{24,28}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27,38}$/u,
         "Invalid Discord bot token format",
       ),
+    /** The Discord guild (server) ID to register slash commands to. Guild-scoped commands update instantly. */
+    // Snowflake: 17-19 digit integer
+    GUILD_ID: snowflake("guild"),
   },
 });

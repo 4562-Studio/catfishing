@@ -4,15 +4,15 @@ import {
   type RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "discord.js";
 import type { Logger } from "pino";
-import ping from "./ping";
-import user from "./utility/user";
 import bait from "./bait";
 import cat from "./cat";
 import cosmetic from "./cosmetic";
+import fishingspot from "./fishingspot";
 import inventory from "./inventory";
+import ping from "./ping";
 import rod from "./rod";
 import sell from "./sell";
-import fishingspot from "./fishingspot";
+import user from "./utility/user";
 
 /**
  * Shared state passed as the second argument to every command's `execute` handler.
