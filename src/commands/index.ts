@@ -4,14 +4,15 @@ import {
   type RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "discord.js";
 import type { Logger } from "pino";
-import ping from "./ping";
-import user from "./utility/user";
 import bait from "./bait";
 import cat from "./cat";
 import cosmetic from "./cosmetic";
+import fishingspot from "./fishingspot";
 import inventory from "./inventory";
+import ping from "./ping";
 import rod from "./rod";
 import sell from "./sell";
+import user from "./utility/user";
 
 /**
  * Shared state passed as the second argument to every command's `execute` handler.
@@ -39,7 +40,7 @@ export interface Command {
 }
 
 // Add new commands here. Each entry is keyed by its slash command name at startup.
-const cmdList = [bait, cat, cosmetic, inventory, ping, rod, sell, user];
+const cmdList = [bait, cat, cosmetic, inventory, ping, rod, sell, user, fishingspot];
 
 /**
  * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.
