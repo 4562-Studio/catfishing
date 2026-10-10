@@ -1,3 +1,4 @@
+import type { BaseInteraction, ButtonInteraction } from "discord.js";
 import {
   type ChatInputCommandInteraction,
   Collection,
@@ -7,6 +8,7 @@ import type { Logger } from "pino";
 import bait from "./bait";
 import cat from "./cat";
 import cosmetic from "./cosmetic";
+import fish, { buttonfish } from "./fish";
 import fishingspot from "./fishingspot";
 import inventory from "./inventory";
 import ping from "./ping";
@@ -24,28 +26,61 @@ export interface BotContext {
   logger: Logger;
 }
 
-/** The shape every command module must export. */
-export interface Command {
-  /** Slash command definition. Used for Discord API registration and interaction routing by name. */
-  data: RESTPostAPIChatInputApplicationCommandsJSONBody;
-
-  /**
-   * Called when a user invokes the command.
-   * Should throw on unrecoverable errors - the caller in index.ts catches and sends an error reply.
+/** Generic interactions interface for routing based on registry and executing commands*/
+interface InteractionModule<IdentifierType, I extends BaseInteraction> {
+  /** @param IdentifierType - generic identifier to route incoming interations, whether via Discord API (REST
+   * POST method .name field for slash commands) or client-side UI buttons (button ID)
+   *
+   * @param I - generic subclass of BaseInteraction, invoked when user interacts
+   * with the bot. Should throw on unrecoverable errors - the caller in index.ts catches and sends an error reply.
    */
-  execute: (
-    interaction: ChatInputCommandInteraction,
-    ctx: BotContext,
-  ) => Promise<void>;
+  data: IdentifierType;
+
+  execute: (interation: I, ctx: BotContext) => Promise<void>;
 }
 
-// Add new commands here. Each entry is keyed by its slash command name at startup.
-const cmdList = [bait, cat, cosmetic, inventory, ping, rod, sell, user, fishingspot];
-
 /**
+ * Identified by
+ */
+export interface Command extends InteractionModule<
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  ChatInputCommandInteraction
+> {}
+
+export interface Button extends InteractionModule<string, ButtonInteraction> {}
+
+/** LISTS OF NAMES TO BE REGISTERED
+ * Add new commands and buttons here.
+ * Commands: each entry is keyed by its slash command name at startup. Served
+ * globally via Discord API
+ * Buttons: client-side UI elements, identifiers work via button.customId.
+ * TODO: Handle buttons with prefixed customId instead of whole words
+ * (e.g., "inventory-next-page-1" vs. "inventory")
+ */
+const cmdList = [
+  bait,
+  cat,
+  cosmetic,
+  fish,
+  fishingspot,
+  inventory,
+  ping,
+  rod,
+  sell,
+  user,
+];
+
+const btnList = [buttonfish];
+
+/** REGISTRIES
  * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.
  * Built once at module load. The `InteractionCreate` handler looks up commands from here.
  */
+
 export const commands = new Collection<string, Command>(
   cmdList.map((cmd) => [cmd.data.name, cmd]),
+);
+
+export const buttons = new Map<string, Button>(
+  btnList.map((btn) => [btn.data, btn]),
 );

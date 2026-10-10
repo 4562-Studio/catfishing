@@ -11,6 +11,7 @@ import {
   ThreadAutoArchiveDuration,
   type ThreadChannel,
 } from "discord.js";
+import { getGuildOrReply, getTextChannelOrReply } from "./reply";
 import type { Logger } from "pino";
 
 interface FishingSpot {
@@ -42,38 +43,6 @@ const WAIT_FOR_BUTTON_TIME_MS = 30_000;
 // Move from memory to DB at some point.
 const activeFishingSpots = new Map<string, FishingSpot>();
 const activeFishingSpotPrompts = new Set<string>();
-
-async function getGuildOrReply(
-  interaction: ChatInputCommandInteraction,
-): Promise<Guild | null> {
-  const { guild } = interaction;
-
-  if (guild !== null) {
-    return guild;
-  }
-
-  await interaction.editReply({
-    content: "You can only use this command in a server.",
-  });
-
-  return null;
-}
-
-async function getTextChannelOrReply(
-  interaction: ChatInputCommandInteraction,
-): Promise<TextChannel | null> {
-  const { channel } = interaction;
-
-  if (channel?.type === ChannelType.GuildText) {
-    return channel as TextChannel;
-  }
-
-  await interaction.editReply({
-    content: "You can only create a fishing spot in a text channel.",
-  });
-
-  return null;
-}
 
 async function getFishingSpotRequest(params: {
   interaction: ChatInputCommandInteraction;
@@ -499,13 +468,19 @@ export async function handleFishingSpotCommand(
   interaction: ChatInputCommandInteraction,
   log: Logger,
 ): Promise<void> {
-  const guild = await getGuildOrReply(interaction);
+  const guild = await getGuildOrReply(
+    interaction,
+    "You can only use this command in a server.",
+  );
 
   if (guild === null) {
     return;
   }
 
-  const channel = await getTextChannelOrReply(interaction);
+  const channel = await getTextChannelOrReply(
+    interaction,
+    "You can only create a fishing spot in a text channel.",
+  );
 
   if (channel === null) {
     return;
